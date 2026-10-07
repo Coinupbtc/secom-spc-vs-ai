@@ -30,11 +30,16 @@ def audit(X: pd.DataFrame) -> dict:
 class Prep:
     """Fit on Phase I-fit passing runs only (missingness filter uses training-period features only)."""
 
-    def fit(self, X: pd.DataFrame, y: np.ndarray):
-        tr = X.iloc[slice(*C.TRAIN)]
+    def fit(self, X: pd.DataFrame, y: np.ndarray, fit_mask=None, train_mask=None):
+        """Default (masks None) = the preregistered setup. Masks are used only by exploratory (post-hoc) analyses:
+        fit_mask selects the runs the statistics are fit on, train_mask the runs used for the missingness filter."""
+        tr = X.iloc[slice(*C.TRAIN)] if train_mask is None else X[train_mask]
         keep = tr.columns[tr.isna().mean() <= C.MAX_MISSING]
         self.dropped_missing = [c for c in X.columns if c not in set(keep)]
-        fitp = X.iloc[slice(*C.FIT)][y[slice(*C.FIT)] == 0][keep]
+        if fit_mask is None:
+            fitp = X.iloc[slice(*C.FIT)][y[slice(*C.FIT)] == 0][keep]
+        else:
+            fitp = X[fit_mask][keep]
         self.median = fitp.median()
         # a column entirely missing among fit passes -> median NaN -> treat as constant (dropped)
         imp = fitp.fillna(self.median)

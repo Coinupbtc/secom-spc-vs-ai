@@ -28,8 +28,31 @@ Everything done with the data before the `prereg` tag, and every departure from 
 
 ## After the `prereg` tag
 
-1. **Machine for the official run.** The prereg commit was authored on the shared build box, because the DGX Spark was temporarily offline.
-   A first `make all` attempt on the box after the tag was interrupted (by an operator steering message) during `secom.run`, before any model metric was computed or printed.
-   It had only written the descriptive `missing_by_sensor.csv`, which was deleted. The official run, the one whose numbers are committed, was then done once on the Spark
-   (CPU only) from the tagged code. `data/MANIFEST.json` was written at the box download, and the Spark download matched all four SHA-256 values.
-2. No analysis choice was changed after the test block was scored. The README interpretation text was written after the results; the tables are generated from `results/results.json`.
+1. **Machine for the official run.** The plan commit was authored on a second machine. A first `make all` attempt there after the tag was an
+   interrupted run, and no metrics were produced (only the descriptive `missing_by_sensor.csv` was written, then deleted). The official run, whose numbers are committed,
+   was done once on the primary machine (CPU only) from the tagged code. `data/MANIFEST.json` was written at the first download, and the later download matched all four SHA-256 values.
+2. No analysis choice in the planned analysis was changed after the test block was scored. The README interpretation text was written after the results;
+   the tables are generated from `results/results.json`.
+3. **History rewritten to remove a sensitive guard token; analysis files byte-identical to b3f2a36.** The original guard script stored a sensitive token.
+   Both original commits were rebuilt with a generic guard (`scripts/identity_guard.py`, `.github/workflows/identity-guard.yml`, which contain no guarded values).
+   Every other file is byte-identical to the originals, and commit messages and author dates are unchanged. The plan tag was re-cut on the rebuilt plan commit.
+   Check: run the following on the plan commit (the commit the `prereg` tag points to).
+   ```bash
+   GIT_INDEX_FILE=/tmp/idx git read-tree <plan-commit>
+   GIT_INDEX_FILE=/tmp/idx git rm -q -f --cached scripts/identity_guard.py .github/workflows/identity-guard.yml
+   GIT_INDEX_FILE=/tmp/idx git write-tree      # -> 24b35ac6dd6bf8d0cf3221eb555facb10035f9d6
+   git ls-tree -r <plan-commit> | grep -v -P '\t(scripts/identity_guard\.py|\.github/workflows/identity-guard\.yml)$' | sha256sum
+                                                # -> 9940bc64f9da6867979c7cf6fc9e15b1644287821c2088025099e76120555dc4
+   ```
+   Both values are identical for the original plan commit `b3f2a36` and the rebuilt one.
+4. **Wording changes after review (no effect on numbers):** the gradient-boosting row is now called "supervised reference (uses labels)". The frozen plan
+   says "upper-bound reference", but one model is not a ceiling. The README says "analysis plan frozen before the test block" instead of "preregistered".
+   AUROCs whose CI includes 0.5 are described as indistinguishable from chance. The earlier README wording that attributed the too-tight textbook limits to drift alone was withdrawn (see item 5).
+   `results.json` now carries a UTC timestamp.
+5. **Exploratory, post-hoc analyses (added after the test block was scored; NOT part of the frozen plan).** The code is in `secom/exploratory.py` and `secom/run.py`, and the outputs are under
+   `exploratory_posthoc` in `results/results.json`. The planned-analysis numbers are unchanged; this was checked field by field against the previous `results.json`.
+   - K2: random (non-time) 25% holdout of Phase I-fit passes, 20 seeds, empirical-vs-textbook T²/SPE limit ratios on the random holdout vs. later blocks.
+     The reading rule was written in the module docstring before running.
+   - K3: share of Western Electric rule-4 hits whose 8-point window contains a median-imputed point, plus an I-MR variant where rule 4 skips imputed points.
+   - Stratified bootstrap 95% CIs (2,000 resamples) on test AUROC.
+   - Random-split AUROC: the same pipeline code on a randomly permuted 626/314/627 split (10 seeds), compared with the time-ordered split.

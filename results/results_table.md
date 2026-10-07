@@ -1,12 +1,12 @@
 Test block: 627 runs (28 fails, 599 passes). Thresholds at α = 1% from Phase I calibration passes (I-MR rows are not calibrated). Cost at R = 10 (assumed); lower is better. Reference costs: never alarm = 0.4466, always alarm = 0.9553.
 
-| method | detected fails | detection rate (95% CI) | false-alarm rate | ARL0 emp. (1/FAR) | ARL1 / median delay / ≤5 runs / censored | AUROC | cost @R=10 |
+| method | detected fails | detection rate (95% CI) | false-alarm rate | ARL0 emp. (1/FAR) | ARL1 / median delay / ≤5 runs / censored | AUROC (bootstrap 95% CI) | cost @R=10 |
 |---|---|---|---|---|---|---|---|
-| PCA Hotelling T² (classic) | 0/28 | 0.000 (0.00–0.12) | 0.022 (13/599) | 37.8 (46.1) | 44.9 / 48 / 0.29 / 1 | 0.424 | 0.4673 |
-| PCA SPE/Q (classic) | 0/28 | 0.000 (0.00–0.12) | 0.042 (25/599) | 20.1 (24.0) | 39.5 / 38 / 0.25 / 1 | 0.474 | 0.4864 |
-| Isolation Forest (ML, unsupervised) | 2/28 | 0.071 (0.02–0.23) | 0.030 (18/599) | 31.8 (33.3) | 25.4 / 19 / 0.21 / 0 | 0.554 | 0.4434 |
-| Autoencoder MLP (ML, unsupervised) | 0/28 | 0.000 (0.00–0.12) | 0.033 (20/599) | 25.1 (30.0) | 43.1 / 46 / 0.25 / 1 | 0.441 | 0.4785 |
-| Gradient boosting (ML, SUPERVISED upper-bound ref, uses labels) | 1/28 | 0.036 (0.01–0.18) | 0.018 (11/599) | 54.3 (54.5) | 22.6 / 12 / 0.21 / 0 | 0.598 | 0.4482 |
+| PCA Hotelling T² (classic) | 0/28 | 0.000 (0.00–0.12) | 0.022 (13/599) | 37.8 (46.1) | 44.9 / 48 / 0.29 / 1 | 0.424 (0.32–0.53) | 0.4673 |
+| PCA SPE/Q (classic) | 0/28 | 0.000 (0.00–0.12) | 0.042 (25/599) | 20.1 (24.0) | 39.5 / 38 / 0.25 / 1 | 0.474 (0.36–0.58) | 0.4864 |
+| Isolation Forest (ML, unsupervised) | 2/28 | 0.071 (0.02–0.23) | 0.030 (18/599) | 31.8 (33.3) | 25.4 / 19 / 0.21 / 0 | 0.554 (0.45–0.66) | 0.4434 |
+| Autoencoder MLP (ML, unsupervised) | 0/28 | 0.000 (0.00–0.12) | 0.033 (20/599) | 25.1 (30.0) | 43.1 / 46 / 0.25 / 1 | 0.441 (0.33–0.54) | 0.4785 |
+| Gradient boosting, supervised reference (uses labels) | 1/28 | 0.036 (0.01–0.18) | 0.018 (11/599) | 54.3 (54.5) | 22.6 / 12 / 0.21 / 0 | 0.598 (0.48–0.71) | 0.4482 |
 | I-MR, WE rules 1-4 + MR, top-10 sensors (classic, uncalibrated) | 28/28 | 1.000 (0.88–1.00) | 1.000 (599/599) | 1.0 (1.0) | 1.0 / 0 / 1.00 / 0 | n/a | 0.9553 |
 | I-MR, rule 1 only, top-10 sensors (classic, uncalibrated) | 12/28 | 0.429 (0.27–0.61) | 0.369 (221/599) | 2.7 (2.7) | 2.8 / 1 / 0.93 / 0 | n/a | 0.6077 |
 

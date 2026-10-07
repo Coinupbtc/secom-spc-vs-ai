@@ -16,7 +16,8 @@ import sklearn
 from . import config as C
 from .data import ROOT, load
 from .methods import (PCAMonitor, autoencoder, gradient_boosting, imr_rules, isolation_forest, rank_sensors)
-from .metrics import evaluate, trivial_costs
+from .metrics import auroc_bootstrap_ci, evaluate, trivial_costs
+from .exploratory import k2_limit_ratios, random_split_auroc
 from .preprocess import Prep, audit
 
 RES = ROOT / "results"
@@ -63,6 +64,7 @@ def main():
         th = thr(s)
         thresholds[name] = {"alpha_0.01": th, "alpha_0.0027": thr(s, C.ALPHA_SECONDARY)}
         methods[name] = evaluate(s[test] > th, yt, s[test])
+        methods[name]["AUROC_bootstrap95_posthoc"] = auroc_bootstrap_ci(yt, s[test])
         secondary[f"{name} @alpha=0.27%"] = evaluate(s[test] > thresholds[name]["alpha_0.0027"], yt, s[test])
     pt2, pq = pca.parametric_limits(C.ALPHA)
     thresholds["PCA_T2"]["parametric_F_0.01"] = pt2
@@ -77,6 +79,10 @@ def main():
     top, top_s = rank_sensors(Ximp[fit], y[fit], prep.cols, C.IMR_TOP_K)
     any_we = np.zeros(len(y), bool)
     any_r1 = np.zeros(len(y), bool)
+    any_we_r4ex = np.zeros(len(y), bool)          # post-hoc K3 variant
+    k3 = {"r4_hits_test": 0, "r4_hits_test_with_imputed_in_window": 0, "per_sensor": []}
+    r4_imp_run = np.zeros(len(y), bool)
+    r4_run = np.zeros(len(y), bool)
     imr_detail = []
     imr_series = {}
     for c in top:
@@ -90,6 +96,24 @@ def main():
         we = r["r1"] | r["r2"] | r["r3"] | r["r4"] | r["mr"]
         any_we |= we
         any_r1 |= r["r1"]
+        # ---- post-hoc K3: was any of the 8 points in a rule-4 window median-imputed?
+        imp = X[c].isna().to_numpy()
+        imp_win = np.convolve(imp.astype(int), np.ones(8, int), mode="full")[: len(imp)] > 0
+        hit = r["r4"] & (pos >= C.TEST[0])
+        k3["r4_hits_test"] += int(hit.sum())
+        k3["r4_hits_test_with_imputed_in_window"] += int((hit & imp_win).sum())
+        r4_run |= hit
+        r4_imp_run |= hit & imp_win
+        # variant: rule 4 evaluated on observed (non-imputed) points only; imputed runs cannot fire rule 4
+        obs = np.where(~imp)[0]
+        zo = r["z"][obs]
+        r4o = (np.convolve((zo > 0).astype(int), np.ones(8, int), "full")[: len(zo)] >= 8) | \
+              (np.convolve((zo < 0).astype(int), np.ones(8, int), "full")[: len(zo)] >= 8)
+        r4ex = np.zeros(len(y), bool); r4ex[obs[r4o]] = True
+        any_we_r4ex |= r["r1"] | r["r2"] | r["r3"] | r4ex | r["mr"]
+        k3["per_sensor"].append({"sensor": c, "missing_pct_all": float(imp.mean() * 100), "r4_hits_test": int(hit.sum()),
+                                 "r4_hits_test_with_imputed": int((hit & imp_win).sum()),
+                                 "r4_hits_test_observed_only": int((r4ex & (pos >= C.TEST[0])).sum())})
         imr_detail.append({
             "sensor": c, "cl": cl, "sigma": sigma, "mrbar": mrbar,
             "test_runs_flagged_by_rule": {k: int(r[k][test].sum()) for k in ["r1", "r2", "r3", "r4", "mr"]},
@@ -98,6 +122,10 @@ def main():
         imr_series[f"{c}__z"] = r["z"]
     methods["IMR_WE_rules_top10"] = evaluate(any_we[test], yt)
     methods["IMR_rule1_only_top10"] = evaluate(any_r1[test], yt)
+    k3["share_of_r4_hits_with_imputed_point"] = (k3["r4_hits_test_with_imputed_in_window"] / k3["r4_hits_test"]) if k3["r4_hits_test"] else None
+    k3["test_runs_with_r4"] = int(r4_run[test].sum())
+    k3["test_runs_with_r4_involving_imputed"] = int(r4_imp_run[test].sum())
+    k3["IMR_WE_rules_r4_observed_only"] = evaluate(any_we_r4ex[test], yt)
     pd.DataFrame({"run_pos": pos, **imr_series}).to_csv(RES / "imr_top_sensors.csv", index=False)
 
     # ---- contributions for every test alarm from T2 / SPE (alpha=1%)
@@ -128,7 +156,7 @@ def main():
                 "time_start": str(t[sl].iloc[0]), "time_end": str(t[sl].iloc[-1])}
 
     out = {
-        "generated_local": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
+        "generated_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "python": platform.python_version(),
         "versions": {"numpy": np.__version__, "pandas": pd.__version__, "sklearn": sklearn.__version__},
         "config": {k: getattr(C, k) for k in dir(C) if k.isupper()},
@@ -147,6 +175,17 @@ def main():
         "methods_primary_alpha_0.01": methods,
         "secondary": secondary,
         "trivial_policies_cost": trivial_costs(yt),
+        "exploratory_posthoc": {
+            "note": "Added after the test block was scored, in response to review. Not part of the frozen analysis plan.",
+            "K2_limit_ratios": k2_limit_ratios(X, y),
+            "K2_primary_model_ratios": {
+                "T2_phase1_cal": thresholds["PCA_T2"]["alpha_0.01"] / pt2,
+                "SPE_phase1_cal": thresholds["PCA_SPE"]["alpha_0.01"] / pq,
+                "T2_test_pass": float(np.quantile(t2[test][yt == 0], 1 - C.ALPHA) / pt2),
+                "SPE_test_pass": float(np.quantile(spe[test][yt == 0], 1 - C.ALPHA) / pq)},
+            "K3_rule4_imputation": k3,
+            "random_split_auroc": random_split_auroc(X, y),
+        },
     }
     (RES / "results.json").write_text(json.dumps(out, indent=2, default=float) + "\n")
     for k, m in methods.items():

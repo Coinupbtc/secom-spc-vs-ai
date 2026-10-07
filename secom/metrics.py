@@ -69,6 +69,17 @@ def evaluate(alarm: np.ndarray, y: np.ndarray, score: np.ndarray | None = None) 
     return out
 
 
+def auroc_bootstrap_ci(y: np.ndarray, score: np.ndarray, n_boot: int = 2000, seed: int = 0):
+    """Stratified (fails and passes resampled separately) percentile bootstrap 95% CI for AUROC. Added post-hoc."""
+    rng = np.random.default_rng(seed)
+    f, p = np.where(y == 1)[0], np.where(y == 0)[0]
+    out = np.empty(n_boot)
+    for b in range(n_boot):
+        idx = np.concatenate([rng.choice(f, len(f)), rng.choice(p, len(p))])
+        out[b] = roc_auc_score(y[idx], score[idx])
+    return [float(np.quantile(out, 0.025)), float(np.quantile(out, 0.975))]
+
+
 def trivial_costs(y: np.ndarray) -> dict:
     n, nf = len(y), int(y.sum())
     return {

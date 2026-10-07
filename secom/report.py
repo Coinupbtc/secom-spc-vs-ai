@@ -23,7 +23,7 @@ NAMES = {
     "IMR_rule1_only_top10": "I-MR, rule 1 only, top-10 sensors (classic, uncalibrated)",
     "IsolationForest": "Isolation Forest (ML, unsupervised)",
     "Autoencoder": "Autoencoder MLP (ML, unsupervised)",
-    "GradBoost_SUPERVISED": "Gradient boosting (ML, SUPERVISED upper-bound ref, uses labels)",
+    "GradBoost_SUPERVISED": "Gradient boosting, supervised reference (uses labels)",
 }
 
 
@@ -65,7 +65,7 @@ def figures(R, sc):
         ax.scatter(sc.run_pos[~fail], sc[k][~fail], s=5, c="0.4")
         ax.scatter(sc.run_pos[fail], sc[k][fail], s=18, c="red", marker="x")
         ax.axhline(R["thresholds"][k]["alpha_0.01"], c="k", ls="--", lw=1)
-        ax.set_ylabel(k, fontsize=8)
+        ax.set_ylabel(k.replace("GradBoost_SUPERVISED", "GradBoost\n(supervised ref)"), fontsize=8)
         if k == "Autoencoder":
             ax.set_yscale("log")
     axes[0].set_title("ML anomaly scores (dashed = 99% threshold on Phase I calibration passes; red x = fail)")
@@ -128,7 +128,7 @@ def figures(R, sc):
     rs = C.COST_SWEEP
     fig, ax = plt.subplots(figsize=(9, 5.5))
     for k, m in M.items():
-        ax.plot(rs, [m["cost"][str(r)] for r in rs], marker="o", label=k, ls="--" if "SUPERVISED" in k else "-")
+        ax.plot(rs, [m["cost"][str(r)] for r in rs], marker="o", label=k.replace("GradBoost_SUPERVISED", "GradBoost (supervised ref, uses labels)"), ls="--" if "SUPERVISED" in k else "-")
     tp = R["trivial_policies_cost"]
     ax.plot(rs, [tp["never_alarm"][str(r)] for r in rs], c="k", ls=":", label="never alarm")
     ax.plot(rs, [tp["always_alarm"][str(r)] for r in rs], c="0.6", ls=":", label="always alarm")
@@ -140,6 +140,52 @@ def figures(R, sc):
     ax.legend(fontsize=7); fig.tight_layout(); fig.savefig(FIG / "cost_sensitivity.png", dpi=130); plt.close(fig)
 
 
+def auc(m):
+    if "AUROC" not in m:
+        return "n/a"
+    ci = m.get("AUROC_bootstrap95_posthoc")
+    return f"{f(m['AUROC'])} ({f(ci[0], 2)}–{f(ci[1], 2)})" if ci else f(m["AUROC"])
+
+
+def exploratory(R):
+    E = R.get("exploratory_posthoc")
+    if not E:
+        return "_not run_"
+    K2, P = E["K2_limit_ratios"], E["K2_primary_model_ratios"]
+    S = K2["summary"]
+    L = ["**Labeled post-hoc:** these were added after the test block was scored, in response to review. They don't change any planned number.", "",
+         f"**1. Are the textbook T²/SPE limits too tight because of drift or because of dimension?** A random 25% of the Phase I-fit passing runs is held out (no time separation),"
+         f" preprocessing + PCA are refit on the other 75% (k = {min(r['k'] for r in K2['per_seed'])}–{max(r['k'] for r in K2['per_seed'])} PCs), and the ratio "
+         f"empirical 99th percentile / textbook 99% limit is measured on each block by the same refit model ({K2['n_seeds']} seeds; median, with min–max):", "",
+         "| statistic | random holdout (same period) | Phase I calibration (later) | test passes (latest) |", "|---|---|---|---|"]
+    for nm in ["T2", "SPE"]:
+        cells = [f"{f(S[f'{nm}_ratio_{b}']['median'], 1)}× ({f(S[f'{nm}_ratio_{b}']['min'], 1)}–{f(S[f'{nm}_ratio_{b}']['max'], 1)}); "
+                 f"FAR at textbook limit {S[f'{nm}_FAR_at_textbook_{b}']['median']*100:.0f}%" for b in ["random_holdout", "phase1_cal", "test"]]
+        L.append(f"| {nm} | " + " | ".join(cells) + " |")
+    L += ["", f"For the planned model, the ratios on the calibration block were {f(P['T2_phase1_cal'], 1)}× (T²) and {f(P['SPE_phase1_cal'], 1)}× (SPE), and on test passes {f(P['T2_test_pass'], 1)}× and {f(P['SPE_test_pass'], 1)}×.",
+          f"Reading rule (written before running): T² → *{K2['verdict']['T2']}*; SPE → *{K2['verdict']['SPE']}*. "
+          "The limits are already far too tight on a random same-period holdout, so the 16–24× gap is **not** evidence of drift by itself: high dimension "
+          "(n ≈ 420–560 passes, ~440 sensors, ~100 PCs), non-normal sensors, and imputation produce most of it. The further jump from the random holdout to the test block "
+          "is consistent with a later process shift on top. v0 does not attribute it more precisely.", ""]
+    K3 = E["K3_rule4_imputation"]
+    v = K3["IMR_WE_rules_r4_observed_only"]
+    L += [f"**2. Is Western Electric rule 4 an imputation artifact?** Of {K3['r4_hits_test']} rule-4 hits (sensor × test run) across the 10 I-MR sensors, "
+          f"{K3['r4_hits_test_with_imputed_in_window']} ({K3['share_of_r4_hits_with_imputed_point']*100:.1f}%) have a median-imputed point in their 8-point window. "
+          f"With rule 4 evaluated on observed points only, the WE-rules chart still alarms on {v['FP']}/{v['n_pass']} test passes and {v['TP']}/{v['n_fail']} fails. "
+          "So rule 4 is not an imputation artifact: these sensors sit on one side of their Phase I mean for long stretches of the test block.", ""]
+    RS = E["random_split_auroc"]
+    T, M = RS["time_ordered_same_code"], RS["random_summary"]
+    nfs = [r["test_fails"] for r in RS["random_per_seed"]]
+    L += [f"**3. Random split vs time-ordered split, same code.** Shuffling the runs before the same 626/314/627 split ({len(nfs)} seeds, {min(nfs)}–{max(nfs)} test fails) vs. the time-ordered split ({RS['time_ordered_test_fails']} test fails):", "",
+          "| method | time-ordered AUROC | random-split AUROC, mean (min–max) |", "|---|---|---|"]
+    for k in T:
+        L.append(f"| {NAMES.get(k, k)} | {f(T[k])} | {f(M[k]['mean'])} ({f(M[k]['min'])}–{f(M[k]['max'])}) |")
+    L += ["", f"Post-hoc: the supervised reference scores AUROC {f(M['GradBoost_SUPERVISED']['mean'], 2)} on average with a random split vs {f(T['GradBoost_SUPERVISED'], 2)} time-ordered. "
+          "Shuffling lets the model train on runs from the same weeks it is tested on, so random-split SECOM numbers flatter every method. "
+          "A deployed monitor only ever sees the past."]
+    return "\n".join(L)
+
+
 def table(R):
     M = R["methods_primary_alpha_0.01"]
     tp = R["trivial_policies_cost"]
@@ -147,14 +193,14 @@ def table(R):
     L = [f"Test block: {R['splits']['test']['n']} runs ({R['splits']['test']['fails']} fails, {R['splits']['test']['passes']} passes). "
          f"Thresholds at α = {C.ALPHA:.0%} from Phase I calibration passes (I-MR rows are not calibrated). Cost at R = {Rr} (assumed); lower is better. "
          f"Reference costs: never alarm = {f(tp['never_alarm'][str(Rr)], 4)}, always alarm = {f(tp['always_alarm'][str(Rr)], 4)}.", "",
-         "| method | detected fails | detection rate (95% CI) | false-alarm rate | ARL0 emp. (1/FAR) | ARL1 / median delay / ≤5 runs / censored | AUROC | cost @R=10 |",
+         "| method | detected fails | detection rate (95% CI) | false-alarm rate | ARL0 emp. (1/FAR) | ARL1 / median delay / ≤5 runs / censored | AUROC (bootstrap 95% CI) | cost @R=10 |",
          "|---|---|---|---|---|---|---|---|"]
     for k, m in M.items():
         lo, hi = m["detection_rate_wilson95"]
         L.append(f"| {NAMES.get(k, k)} | {m['TP']}/{m['n_fail']} | {f(m['detection_rate'])} ({f(lo, 2)}–{f(hi, 2)}) | "
                  f"{f(m['false_alarm_rate'])} ({m['FP']}/{m['n_pass']}) | {f(m['ARL0_empirical'], 1)} ({f(m['ARL0_geometric'], 1)}) | "
                  f"{f(m['ARL1_mean_runs_to_signal'], 1)} / {f(m['delay_median'], 0)} / {f(m['detected_within_5_runs'], 2)} / {m['delay_censored']} | "
-                 f"{f(m.get('AUROC')) if 'AUROC' in m else 'n/a'} | {f(m['cost_primary'], 4)} |")
+                 f"{auc(m)} | {f(m['cost_primary'], 4)} |")
     L += ["", "Cost sensitivity (cost per test run; thresholds fixed at α = 1%):", "",
           "| method | " + " | ".join(f"R={r}" for r in C.COST_SWEEP) + " |", "|---|" + "---|" * len(C.COST_SWEEP)]
     for k, m in M.items():
@@ -192,7 +238,7 @@ def main():
     (RES / "results_table.md").write_text(table(R) + "\n")
     rd = ROOT / "README.md"
     txt = rd.read_text()
-    for tag, body in [("RESULTS", table(R)), ("DATA", data_section(R))]:
+    for tag, body in [("RESULTS", table(R)), ("DATA", data_section(R)), ("EXPLORATORY", exploratory(R))]:
         txt = re.sub(rf"<!-- {tag}:START -->.*?<!-- {tag}:END -->",
                      f"<!-- {tag}:START -->\n<!-- generated by `python -m secom.report` from results/results.json; do not edit by hand -->\n{body}\n<!-- {tag}:END -->",
                      txt, flags=re.S)
