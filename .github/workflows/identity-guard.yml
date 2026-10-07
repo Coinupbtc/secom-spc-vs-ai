@@ -1,0 +1,19 @@
+name: identity-guard
+on:
+  push:
+  pull_request:
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Identifier guard (keyed; skipped when secrets are absent)
+        env:
+          IDENTITY_GUARD_KEY: ${{ secrets.IDENTITY_GUARD_KEY }}
+          IDENTITY_GUARD_DIGESTS: ${{ secrets.IDENTITY_GUARD_DIGESTS }}
+        run: python scripts/identity_guard.py
