@@ -28,4 +28,8 @@ Everything done with the data before the `prereg` tag, and every departure from 
 
 ## After the `prereg` tag
 
-(none yet; anything added below this line is a deviation)
+1. **Machine for the official run.** The prereg commit was authored on the shared build box, because the DGX Spark was temporarily offline.
+   A first `make all` attempt on the box after the tag was interrupted (by an operator steering message) during `secom.run`, before any model metric was computed or printed.
+   It had only written the descriptive `missing_by_sensor.csv`, which was deleted. The official run, the one whose numbers are committed, was then done once on the Spark
+   (CPU only) from the tagged code. `data/MANIFEST.json` was written at the box download, and the Spark download matched all four SHA-256 values.
+2. No analysis choice was changed after the test block was scored. The README interpretation text was written after the results; the tables are generated from `results/results.json`.

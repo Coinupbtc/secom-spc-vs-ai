@@ -1,0 +1,857 @@
+{
+  "generated_local": "2026-10-07T16:35:11-05:00",
+  "python": "3.12.13",
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "sklearn": "1.9.1"
+  },
+  "config": {
+    "ALPHA": 0.01,
+    "ALPHA_SECONDARY": 0.0027,
+    "CAL": [
+      626,
+      940
+    ],
+    "COST_RATIO": 10,
+    "COST_SWEEP": [
+      1,
+      5,
+      10,
+      20,
+      50
+    ],
+    "FIT": [
+      0,
+      626
+    ],
+    "IMR_TOP_K": 10,
+    "MAX_MISSING": 0.5,
+    "N_TOTAL": 1567,
+    "PCA_VAR": 0.9,
+    "SEED": 0,
+    "TEST": [
+      940,
+      1567
+    ],
+    "TRAIN": [
+      0,
+      940
+    ]
+  },
+  "time_order": {
+    "already_sorted_in_file": true,
+    "rows_with_tied_timestamp": 33,
+    "tie_rule": "stable sort, file order kept"
+  },
+  "splits": {
+    "phase1_fit": {
+      "n": 626,
+      "fails": 65,
+      "passes": 561,
+      "first_run": 0,
+      "last_run": 625,
+      "time_start": "2008-07-19 11:55:00",
+      "time_end": "2008-09-01 06:21:00"
+    },
+    "phase1_cal": {
+      "n": 314,
+      "fails": 11,
+      "passes": 303,
+      "first_run": 626,
+      "last_run": 939,
+      "time_start": "2008-09-01 06:52:00",
+      "time_end": "2008-09-20 05:34:00"
+    },
+    "test": {
+      "n": 627,
+      "fails": 28,
+      "passes": 599,
+      "first_run": 940,
+      "last_run": 1566,
+      "time_start": "2008-09-20 06:08:00",
+      "time_end": "2008-10-17 06:07:00"
+    }
+  },
+  "missing_audit": {
+    "cells_missing_frac_all": 0.04537548808583821,
+    "sensors_with_any_missing_all": 538,
+    "sensors_missing_hist_all": {
+      "0%": 52,
+      "(0,5%]": 486,
+      "(5,20%]": 20,
+      "(20,50%]": 4,
+      ">50%": 28
+    },
+    "sensors_gt50pct_missing_train": 24,
+    "sensors_constant_all": 116,
+    "sensors_constant_train": 122
+  },
+  "preprocessing": {
+    "sensors_raw": 590,
+    "dropped_gt50pct_missing_train": 24,
+    "dropped_constant_phase1_fit_pass": 122,
+    "sensors_kept": 444,
+    "imputation": "median of Phase I-fit passing runs",
+    "scaling": "z-score, Phase I-fit passing runs",
+    "dropped_missing_list": [
+      "sensor_085",
+      "sensor_109",
+      "sensor_110",
+      "sensor_111",
+      "sensor_157",
+      "sensor_158",
+      "sensor_220",
+      "sensor_244",
+      "sensor_245",
+      "sensor_246",
+      "sensor_292",
+      "sensor_293",
+      "sensor_358",
+      "sensor_382",
+      "sensor_383",
+      "sensor_384",
+      "sensor_492",
+      "sensor_516",
+      "sensor_517",
+      "sensor_518",
+      "sensor_578",
+      "sensor_579",
+      "sensor_580",
+      "sensor_581"
+    ]
+  },
+  "pca": {
+    "k": 110,
+    "var_explained": 0.9019319482635605,
+    "n_fit": 561
+  },
+  "imr": {
+    "top_sensors": [
+      "sensor_059",
+      "sensor_021",
+      "sensor_000",
+      "sensor_477",
+      "sensor_341",
+      "sensor_205",
+      "sensor_128",
+      "sensor_126",
+      "sensor_022",
+      "sensor_122"
+    ],
+    "rank_score_abs_auc_minus_half": [
+      0.17001234060057602,
+      0.14300013711778425,
+      0.12686137392019742,
+      0.12265185794597555,
+      0.12143150966680383,
+      0.12114356232003298,
+      0.12047168517756757,
+      0.11031125737008085,
+      0.10235842588783767,
+      0.1018099547511312
+    ],
+    "detail": [
+      {
+        "sensor": "sensor_059",
+        "cl": 7.020703565062389,
+        "sigma": 8.638299297112463,
+        "mrbar": 9.744001607142858,
+        "test_runs_flagged_by_rule": {
+          "r1": 0,
+          "r2": 0,
+          "r3": 75,
+          "r4": 583,
+          "mr": 0
+        }
+      },
+      {
+        "sensor": "sensor_021",
+        "cl": -5741.939393939394,
+        "sigma": 585.3925246960487,
+        "mrbar": 660.3227678571428,
+        "test_runs_flagged_by_rule": {
+          "r1": 0,
+          "r2": 0,
+          "r3": 3,
+          "r4": 237,
+          "mr": 0
+        }
+      },
+      {
+        "sensor": "sensor_000",
+        "cl": 3007.3491265597145,
+        "sigma": 64.38652482269502,
+        "mrbar": 72.62799999999999,
+        "test_runs_flagged_by_rule": {
+          "r1": 28,
+          "r2": 29,
+          "r3": 7,
+          "r4": 3,
+          "mr": 37
+        }
+      },
+      {
+        "sensor": "sensor_477",
+        "cl": 7.214842602495543,
+        "sigma": 3.95697695035461,
+        "mrbar": 4.46347,
+        "test_runs_flagged_by_rule": {
+          "r1": 4,
+          "r2": 0,
+          "r3": 6,
+          "r4": 280,
+          "mr": 8
+        }
+      },
+      {
+        "sensor": "sensor_341",
+        "cl": 3.0826628342245987,
+        "sigma": 1.5211746453900712,
+        "mrbar": 1.715885,
+        "test_runs_flagged_by_rule": {
+          "r1": 4,
+          "r2": 0,
+          "r3": 6,
+          "r4": 262,
+          "mr": 8
+        }
+      },
+      {
+        "sensor": "sensor_205",
+        "cl": 10.30263814616756,
+        "sigma": 5.266828140830801,
+        "mrbar": 5.940982142857142,
+        "test_runs_flagged_by_rule": {
+          "r1": 4,
+          "r2": 0,
+          "r3": 8,
+          "r4": 242,
+          "mr": 8
+        }
+      },
+      {
+        "sensor": "sensor_128",
+        "cl": 3.171377896613191,
+        "sigma": 0.10501678064842958,
+        "mrbar": 0.11845892857142855,
+        "test_runs_flagged_by_rule": {
+          "r1": 46,
+          "r2": 123,
+          "r3": 191,
+          "r4": 160,
+          "mr": 58
+        }
+      },
+      {
+        "sensor": "sensor_126",
+        "cl": 2.703659536541889,
+        "sigma": 0.1276136651469099,
+        "mrbar": 0.14394821428571433,
+        "test_runs_flagged_by_rule": {
+          "r1": 35,
+          "r2": 131,
+          "r3": 253,
+          "r4": 212,
+          "mr": 46
+        }
+      },
+      {
+        "sensor": "sensor_022",
+        "cl": 2787.277183600713,
+        "sigma": 273.6642762158055,
+        "mrbar": 308.69330357142854,
+        "test_runs_flagged_by_rule": {
+          "r1": 0,
+          "r2": 2,
+          "r3": 8,
+          "r4": 357,
+          "mr": 0
+        }
+      },
+      {
+        "sensor": "sensor_122",
+        "cl": 3.8006595365418896,
+        "sigma": 0.31939906281661606,
+        "mrbar": 0.3602821428571429,
+        "test_runs_flagged_by_rule": {
+          "r1": 169,
+          "r2": 312,
+          "r3": 395,
+          "r4": 219,
+          "mr": 115
+        }
+      }
+    ]
+  },
+  "autoencoder": {
+    "n_iter": 436,
+    "final_loss": 0.21007392012252205
+  },
+  "thresholds": {
+    "PCA_T2": {
+      "alpha_0.01": 3044.1270787942913,
+      "alpha_0.0027": 4074.893241267383,
+      "parametric_F_0.01": 191.1806130597201
+    },
+    "PCA_SPE": {
+      "alpha_0.01": 1438.9175024729013,
+      "alpha_0.0027": 5143.228910286343,
+      "parametric_JM_0.01": 60.79080043824245
+    },
+    "IsolationForest": {
+      "alpha_0.01": 0.4479605038925514,
+      "alpha_0.0027": 0.4534422371782116
+    },
+    "Autoencoder": {
+      "alpha_0.01": 14.755933152433151,
+      "alpha_0.0027": 24.562902564175495
+    },
+    "GradBoost_SUPERVISED": {
+      "alpha_0.01": 0.05830125758654817,
+      "alpha_0.0027": 0.1057152838906946
+    }
+  },
+  "methods_primary_alpha_0.01": {
+    "PCA_T2": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 0,
+      "FN": 28,
+      "FP": 13,
+      "TN": 586,
+      "detection_rate": 0.0,
+      "detection_rate_wilson95": [
+        0.0,
+        0.12064720365810762
+      ],
+      "false_alarm_rate": 0.021702838063439065,
+      "false_alarm_rate_wilson95": [
+        0.012726244103996231,
+        0.03677531650495975
+      ],
+      "ARL0_geometric": 46.07692307692308,
+      "ARL0_empirical": 37.84615384615385,
+      "ARL1_mean_runs_to_signal": 44.892857142857146,
+      "delay_median": 48.5,
+      "detected_within_5_runs": 0.2857142857142857,
+      "delay_censored": 1,
+      "cost": {
+        "1": 0.06539074960127592,
+        "5": 0.24401913875598086,
+        "10": 0.46730462519936206,
+        "20": 0.9138755980861244,
+        "50": 2.2535885167464116
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.46730462519936206,
+      "AUROC": 0.4237419508704985
+    },
+    "PCA_SPE": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 0,
+      "FN": 28,
+      "FP": 25,
+      "TN": 574,
+      "detection_rate": 0.0,
+      "detection_rate_wilson95": [
+        0.0,
+        0.12064720365810762
+      ],
+      "false_alarm_rate": 0.041736227045075125,
+      "false_alarm_rate_wilson95": [
+        0.028427173306011057,
+        0.06088584026173211
+      ],
+      "ARL0_geometric": 23.96,
+      "ARL0_empirical": 20.12,
+      "ARL1_mean_runs_to_signal": 39.5,
+      "delay_median": 38.0,
+      "detected_within_5_runs": 0.25,
+      "delay_censored": 1,
+      "cost": {
+        "1": 0.08452950558213716,
+        "5": 0.2631578947368421,
+        "10": 0.4864433811802233,
+        "20": 0.9330143540669856,
+        "50": 2.272727272727273
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.4864433811802233,
+      "AUROC": 0.4741235392320534
+    },
+    "IsolationForest": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 2,
+      "FN": 26,
+      "FP": 18,
+      "TN": 581,
+      "detection_rate": 0.07142857142857142,
+      "detection_rate_wilson95": [
+        0.019811647447770794,
+        0.2264573842591786
+      ],
+      "false_alarm_rate": 0.03005008347245409,
+      "false_alarm_rate_wilson95": [
+        0.01909105663907193,
+        0.04699860936937872
+      ],
+      "ARL0_geometric": 33.27777777777778,
+      "ARL0_empirical": 31.77777777777778,
+      "ARL1_mean_runs_to_signal": 25.357142857142858,
+      "delay_median": 19.0,
+      "detected_within_5_runs": 0.21428571428571427,
+      "delay_censored": 0,
+      "cost": {
+        "1": 0.07017543859649122,
+        "5": 0.23604465709728867,
+        "10": 0.4433811802232855,
+        "20": 0.8580542264752791,
+        "50": 2.1020733652312598
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.4433811802232855,
+      "AUROC": 0.5540782256141188
+    },
+    "Autoencoder": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 0,
+      "FN": 28,
+      "FP": 20,
+      "TN": 579,
+      "detection_rate": 0.0,
+      "detection_rate_wilson95": [
+        0.0,
+        0.12064720365810762
+      ],
+      "false_alarm_rate": 0.0333889816360601,
+      "false_alarm_rate_wilson95": [
+        0.02171635651861106,
+        0.05100855164963744
+      ],
+      "ARL0_geometric": 29.950000000000003,
+      "ARL0_empirical": 25.15,
+      "ARL1_mean_runs_to_signal": 43.142857142857146,
+      "delay_median": 46.5,
+      "detected_within_5_runs": 0.25,
+      "delay_censored": 1,
+      "cost": {
+        "1": 0.07655502392344497,
+        "5": 0.2551834130781499,
+        "10": 0.4784688995215311,
+        "20": 0.9250398724082934,
+        "50": 2.2647527910685805
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.4784688995215311,
+      "AUROC": 0.44061531123300735
+    },
+    "GradBoost_SUPERVISED": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 1,
+      "FN": 27,
+      "FP": 11,
+      "TN": 588,
+      "detection_rate": 0.03571428571428571,
+      "detection_rate_wilson95": [
+        0.00633235649754188,
+        0.17712576118498663
+      ],
+      "false_alarm_rate": 0.018363939899833055,
+      "false_alarm_rate_wilson95": [
+        0.010284390383271927,
+        0.03258192806588619
+      ],
+      "ARL0_geometric": 54.45454545454545,
+      "ARL0_empirical": 54.27272727272727,
+      "ARL1_mean_runs_to_signal": 22.571428571428573,
+      "delay_median": 12.5,
+      "detected_within_5_runs": 0.21428571428571427,
+      "delay_censored": 0,
+      "cost": {
+        "1": 0.06060606060606061,
+        "5": 0.23285486443381181,
+        "10": 0.4481658692185008,
+        "20": 0.8787878787878788,
+        "50": 2.1706539074960127
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.4481658692185008,
+      "AUROC": 0.5982590031004054
+    },
+    "IMR_WE_rules_top10": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 28,
+      "FN": 0,
+      "FP": 599,
+      "TN": 0,
+      "detection_rate": 1.0,
+      "detection_rate_wilson95": [
+        0.8793527963418923,
+        1.0
+      ],
+      "false_alarm_rate": 1.0,
+      "false_alarm_rate_wilson95": [
+        0.99362751342973,
+        0.9999999999999999
+      ],
+      "ARL0_geometric": 1.0,
+      "ARL0_empirical": 1.0,
+      "ARL1_mean_runs_to_signal": 1.0,
+      "delay_median": 0.0,
+      "detected_within_5_runs": 1.0,
+      "delay_censored": 0,
+      "cost": {
+        "1": 0.9553429027113237,
+        "5": 0.9553429027113237,
+        "10": 0.9553429027113237,
+        "20": 0.9553429027113237,
+        "50": 0.9553429027113237
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.9553429027113237
+    },
+    "IMR_rule1_only_top10": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 12,
+      "FN": 16,
+      "FP": 221,
+      "TN": 378,
+      "detection_rate": 0.42857142857142855,
+      "detection_rate_wilson95": [
+        0.2650829618073122,
+        0.609295210143846
+      ],
+      "false_alarm_rate": 0.36894824707846413,
+      "false_alarm_rate_wilson95": [
+        0.3312557927277304,
+        0.40831095250020344
+      ],
+      "ARL0_geometric": 2.710407239819004,
+      "ARL0_empirical": 2.6968325791855206,
+      "ARL1_mean_runs_to_signal": 2.7857142857142856,
+      "delay_median": 1.0,
+      "detected_within_5_runs": 0.9285714285714286,
+      "delay_censored": 0,
+      "cost": {
+        "1": 0.37799043062200954,
+        "5": 0.4800637958532695,
+        "10": 0.6076555023923444,
+        "20": 0.8628389154704944,
+        "50": 1.6283891547049443
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.6076555023923444
+    }
+  },
+  "secondary": {
+    "PCA_T2 @alpha=0.27%": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 0,
+      "FN": 28,
+      "FP": 7,
+      "TN": 592,
+      "detection_rate": 0.0,
+      "detection_rate_wilson95": [
+        0.0,
+        0.12064720365810762
+      ],
+      "false_alarm_rate": 0.011686143572621035,
+      "false_alarm_rate_wilson95": [
+        0.005671983548216596,
+        0.023923850581345798
+      ],
+      "ARL0_geometric": 85.57142857142857,
+      "ARL0_empirical": 70.0,
+      "ARL1_mean_runs_to_signal": 67.71428571428571,
+      "delay_median": 64.5,
+      "detected_within_5_runs": 0.10714285714285714,
+      "delay_censored": 1,
+      "cost": {
+        "1": 0.05582137161084529,
+        "5": 0.23444976076555024,
+        "10": 0.45773524720893144,
+        "20": 0.9043062200956937,
+        "50": 2.2440191387559807
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.45773524720893144,
+      "AUROC": 0.4237419508704985
+    },
+    "PCA_SPE @alpha=0.27%": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 0,
+      "FN": 28,
+      "FP": 6,
+      "TN": 593,
+      "detection_rate": 0.0,
+      "detection_rate_wilson95": [
+        0.0,
+        0.12064720365810762
+      ],
+      "false_alarm_rate": 0.01001669449081803,
+      "false_alarm_rate_wilson95": [
+        0.004598536878143076,
+        0.021679676171520383
+      ],
+      "ARL0_geometric": 99.83333333333333,
+      "ARL0_empirical": 82.0,
+      "ARL1_mean_runs_to_signal": 73.35714285714286,
+      "delay_median": 71.5,
+      "detected_within_5_runs": 0.10714285714285714,
+      "delay_censored": 1,
+      "cost": {
+        "1": 0.05422647527910686,
+        "5": 0.23285486443381181,
+        "10": 0.45614035087719296,
+        "20": 0.9027113237639554,
+        "50": 2.242424242424242
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.45614035087719296,
+      "AUROC": 0.4741235392320534
+    },
+    "IsolationForest @alpha=0.27%": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 1,
+      "FN": 27,
+      "FP": 12,
+      "TN": 587,
+      "detection_rate": 0.03571428571428571,
+      "detection_rate_wilson95": [
+        0.00633235649754188,
+        0.17712576118498663
+      ],
+      "false_alarm_rate": 0.02003338898163606,
+      "false_alarm_rate_wilson95": [
+        0.011496284960164666,
+        0.03468765456889238
+      ],
+      "ARL0_geometric": 49.916666666666664,
+      "ARL0_empirical": 47.166666666666664,
+      "ARL1_mean_runs_to_signal": 42.357142857142854,
+      "delay_median": 33.5,
+      "detected_within_5_runs": 0.10714285714285714,
+      "delay_censored": 0,
+      "cost": {
+        "1": 0.06220095693779904,
+        "5": 0.23444976076555024,
+        "10": 0.44976076555023925,
+        "20": 0.8803827751196173,
+        "50": 2.172248803827751
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.44976076555023925,
+      "AUROC": 0.5540782256141188
+    },
+    "Autoencoder @alpha=0.27%": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 0,
+      "FN": 28,
+      "FP": 8,
+      "TN": 591,
+      "detection_rate": 0.0,
+      "detection_rate_wilson95": [
+        0.0,
+        0.12064720365810762
+      ],
+      "false_alarm_rate": 0.01335559265442404,
+      "false_alarm_rate_wilson95": [
+        0.0067826022924937935,
+        0.026130852916967533
+      ],
+      "ARL0_geometric": 74.875,
+      "ARL0_empirical": 61.5,
+      "ARL1_mean_runs_to_signal": 67.71428571428571,
+      "delay_median": 64.5,
+      "detected_within_5_runs": 0.10714285714285714,
+      "delay_censored": 1,
+      "cost": {
+        "1": 0.05741626794258373,
+        "5": 0.23604465709728867,
+        "10": 0.45933014354066987,
+        "20": 0.9059011164274322,
+        "50": 2.245614035087719
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.45933014354066987,
+      "AUROC": 0.44061531123300735
+    },
+    "GradBoost_SUPERVISED @alpha=0.27%": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 1,
+      "FN": 27,
+      "FP": 3,
+      "TN": 596,
+      "detection_rate": 0.03571428571428571,
+      "detection_rate_wilson95": [
+        0.00633235649754188,
+        0.17712576118498663
+      ],
+      "false_alarm_rate": 0.005008347245409015,
+      "false_alarm_rate_wilson95": [
+        0.0017046903889589545,
+        0.014620659421007709
+      ],
+      "ARL0_geometric": 199.66666666666666,
+      "ARL0_empirical": 199.0,
+      "ARL1_mean_runs_to_signal": 100.64285714285714,
+      "delay_median": 100.0,
+      "detected_within_5_runs": 0.17857142857142858,
+      "delay_censored": 0,
+      "cost": {
+        "1": 0.04784688995215311,
+        "5": 0.22009569377990432,
+        "10": 0.4354066985645933,
+        "20": 0.8660287081339713,
+        "50": 2.1578947368421053
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.4354066985645933,
+      "AUROC": 0.5982590031004054
+    },
+    "PCA_T2 @parametric F 99%": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 25,
+      "FN": 3,
+      "FP": 554,
+      "TN": 45,
+      "detection_rate": 0.8928571428571429,
+      "detection_rate_wilson95": [
+        0.7280377463234293,
+        0.9628823079452005
+      ],
+      "false_alarm_rate": 0.9248747913188647,
+      "false_alarm_rate_wilson95": [
+        0.9009517228580389,
+        0.9433828419762392
+      ],
+      "ARL0_geometric": 1.0812274368231047,
+      "ARL0_empirical": 1.0812274368231047,
+      "ARL1_mean_runs_to_signal": 1.1071428571428572,
+      "delay_median": 0.0,
+      "detected_within_5_runs": 1.0,
+      "delay_censored": 0,
+      "cost": {
+        "1": 0.8883572567783095,
+        "5": 0.9074960127591707,
+        "10": 0.9314194577352473,
+        "20": 0.9792663476874003,
+        "50": 1.1228070175438596
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.9314194577352473,
+      "AUROC": 0.4237419508704985
+    },
+    "PCA_SPE @parametric Jackson-Mudholkar 99%": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 28,
+      "FN": 0,
+      "FP": 599,
+      "TN": 0,
+      "detection_rate": 1.0,
+      "detection_rate_wilson95": [
+        0.8793527963418923,
+        1.0
+      ],
+      "false_alarm_rate": 1.0,
+      "false_alarm_rate_wilson95": [
+        0.99362751342973,
+        0.9999999999999999
+      ],
+      "ARL0_geometric": 1.0,
+      "ARL0_empirical": 1.0,
+      "ARL1_mean_runs_to_signal": 1.0,
+      "delay_median": 0.0,
+      "detected_within_5_runs": 1.0,
+      "delay_censored": 0,
+      "cost": {
+        "1": 0.9553429027113237,
+        "5": 0.9553429027113237,
+        "10": 0.9553429027113237,
+        "20": 0.9553429027113237,
+        "50": 0.9553429027113237
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.9553429027113237,
+      "AUROC": 0.4741235392320534
+    },
+    "PCA_T2_or_SPE @alpha=1% each": {
+      "n_test": 627,
+      "n_fail": 28,
+      "n_pass": 599,
+      "TP": 0,
+      "FN": 28,
+      "FP": 29,
+      "TN": 570,
+      "detection_rate": 0.0,
+      "detection_rate_wilson95": [
+        0.0,
+        0.12064720365810762
+      ],
+      "false_alarm_rate": 0.048414023372287146,
+      "false_alarm_rate_wilson95": [
+        0.033917560202538694,
+        0.0686659376848002
+      ],
+      "ARL0_geometric": 20.655172413793103,
+      "ARL0_empirical": 17.344827586206897,
+      "ARL1_mean_runs_to_signal": 37.25,
+      "delay_median": 32.0,
+      "detected_within_5_runs": 0.32142857142857145,
+      "delay_censored": 1,
+      "cost": {
+        "1": 0.09090909090909091,
+        "5": 0.26953748006379585,
+        "10": 0.49282296650717705,
+        "20": 0.9393939393939394,
+        "50": 2.2791068580542264
+      },
+      "cost_primary_R": 10,
+      "cost_primary": 0.49282296650717705
+    }
+  },
+  "trivial_policies_cost": {
+    "never_alarm": {
+      "1": 0.044657097288676235,
+      "5": 0.22328548644338117,
+      "10": 0.44657097288676234,
+      "20": 0.8931419457735247,
+      "50": 2.2328548644338118
+    },
+    "always_alarm": {
+      "1": 0.9553429027113237,
+      "5": 0.9553429027113237,
+      "10": 0.9553429027113237,
+      "20": 0.9553429027113237,
+      "50": 0.9553429027113237
+    }
+  }
+}
