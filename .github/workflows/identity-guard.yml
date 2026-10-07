@@ -2,6 +2,7 @@ name: identity-guard
 on:
   push:
   pull_request:
+  workflow_dispatch:
 jobs:
   guard:
     runs-on: ubuntu-latest

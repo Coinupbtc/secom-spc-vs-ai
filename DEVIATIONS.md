@@ -56,3 +56,5 @@ Everything done with the data before the `prereg` tag, and every departure from 
    - K3: share of Western Electric rule-4 hits whose 8-point window contains a median-imputed point, plus an I-MR variant where rule 4 skips imputed points.
    - Stratified bootstrap 95% CIs (2,000 resamples) on test AUROC.
    - Random-split AUROC: the same pipeline code on a randomly permuted 626/314/627 split (10 seeds), compared with the time-ordered split.
+6. **Repository recreated (2026-10-07).** The GitHub repository was deleted and recreated from the rewritten history (item 3), so the pre-rewrite
+   commits are no longer reachable there. The keyed identifier check now runs in CI (secrets configured), and the workflow can be triggered manually.
