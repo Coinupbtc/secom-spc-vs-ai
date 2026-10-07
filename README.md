@@ -1,6 +1,6 @@
 # secom-spc-vs-ai (v0)
 
-**On real fab data with a time-ordered holdout and a calibrated 1% false-alarm budget, neither control charts nor ML caught failing runs better than doing nothing, and the Phase I limits went stale within weeks. Re-baseline before you compare alarms.**
+**On real fab data with a time-ordered holdout and a calibrated 1% false-alarm budget, neither control charts nor ML caught failing runs better than doing nothing, and the Phase I limits over-alarmed 1.8–4.2× their 1% target on later passes. Re-baselining is the obvious next test (not done here).**
 
 **Question:** on real semiconductor fab data, do machine-learning anomaly detectors catch failing production runs better than
 classic statistical process control (SPC) charts at the same false-alarm budget?
@@ -23,12 +23,12 @@ The gradient-boosting row is a **supervised reference (uses labels)**, not a com
 ## Reproduce
 
 ```bash
-pip install -r requirements.txt   # numpy pandas scipy scikit-learn matplotlib
+pip install -r requirements.txt   # exact pins; results were produced with Python 3.12.13
 make all                          # = python -m secom.data && python -m secom.run && python -m secom.report
 ```
 
 `make all` downloads the zip from UCI, checks it against the SHA-256 values in `data/MANIFEST.json`, and runs every method with fixed seeds
-(CPU only; the planned analysis takes well under a minute, and the post-hoc checks bring the total to about 4–5 minutes). It writes `results/results.json` and regenerates
+(the planned analysis takes well under a minute; with the post-hoc checks the total is about 5–10 min on CPU). It writes `results/results.json` and regenerates
 `figures/*.png` and every table below from that JSON.
 
 ## Results (planned analysis)
@@ -92,7 +92,7 @@ How to read it:
   But the 95% Wilson intervals overlap almost completely (0.02–0.23 vs 0.00–0.12), so the plan's rule calls this **not decisive**: a tie at "barely works."
 - **Versus doing nothing:** at R = 10, "never alarm" costs 0.4466. Isolation Forest (0.4434) is the only method below it, by about 2 cost units over 627 runs, which is noise.
   The supervised reference (0.4482) does not beat it.
-- **The limits went stale.** Every model fit on Phase I runs alarms on test passes more often (1.8–4.2%) than its 1% target, even with limits calibrated on held-out
+- **The limits over-alarmed on later passes.** Every model fit on Phase I runs alarms on test passes more often (1.8–4.2%) than its 1% target, even with limits calibrated on held-out
   Phase I passes. Textbook parametric T²/SPE limits were **16× and 24× too tight** on the Phase I calibration block. A post-hoc random-holdout check (below) shows
   that most of that gap appears even with no time separation, which points to high dimension, non-normality, and imputation. Scores then jump much further in the test block,
   which is consistent with a later process shift on top of that.
